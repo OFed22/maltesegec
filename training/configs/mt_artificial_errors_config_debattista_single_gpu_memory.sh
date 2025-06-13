@@ -1,0 +1,49 @@
+#!/bin/bash
+TRANSLATE='gpu'
+NUM_GPUS=1
+INPUT_WORD_DROPOUT_RATE=0.2
+TARGET_WORD_DROPOUT_RATE=0.1
+EDIT_WEIGHT=3
+MODEL=transformer
+MODEL_TYPE=transformer_base_single_gpu_with_dropout
+EXPERIMENT_ROOT_DIR=/home/fed/malteseGEC/training
+PROBLEM=artificial_errors
+PROBLEM_DIR=$EXPERIMENT_ROOT_DIR/problems/
+TRAIN_DIR=$EXPERIMENT_ROOT_DIR/t2t_train
+DATA_DIR=$EXPERIMENT_ROOT_DIR/t2t_data
+BATCH_SIZE=1024
+MAX_LEN=150
+WARMUP_STEPS=10000
+LEARNING_RATE_CONSTANT=1
+
+# decoding (Tensorboard)
+BEAM_SIZE=4
+ALPHA=0.6
+
+# Debattista's dataset - no synthetic error generation
+# Using placeholder values for compatibility with scripts
+TOKEN_ERR_PROB="0"
+TOKEN_ERR_DISTRIBUTION="0_0_0_0_0"
+CHAR_ERROR_PROB="0"
+CHAR_ERR_DISTRIBUTION="0_0_0_0_0_0"
+MODE="debattista"
+LANG="mt"
+
+# technical stuff
+RANDOM_SEED=88
+
+# Directory naming - special case for pre-existing dataset
+NO_EDIT_DATA_DIR=${DATA_DIR}/$PROBLEM-$LANG-$MODE
+DATA_DIR=${NO_EDIT_DATA_DIR}-${EDIT_WEIGHT}
+TRAIN_DIR=${TRAIN_DIR}/$PROBLEM-$LANG-$MODE/$MODEL-$MODEL_TYPE-iwdr${INPUT_WORD_DROPOUT_RATE}-twdr${TARGET_WORD_DROPOUT_RATE}-ew${EDIT_WEIGHT}-ws${WARMUP_STEPS}-lrc${LEARNING_RATE_CONSTANT}
+
+# Memory management settings
+export TF_FORCE_GPU_ALLOW_GROWTH=true
+export TF_GPU_ALLOCATOR=cuda_malloc_async
+export TF_DISABLE_CUBLAS_GEMM=1
+export TF_ENABLE_CUBLAS_TENSOR_OP_MATH_FP32=0
+export TF_ENABLE_CUDNN_TENSOR_OP_MATH_FP32=0
+export NVIDIA_TF32_OVERRIDE=0
+export CUDA_CACHE_DISABLE=1
+export TF_GPU_THREAD_MODE=gpu_private
+export TF_GPU_THREAD_COUNT=1
