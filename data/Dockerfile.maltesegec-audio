@@ -1,0 +1,20 @@
+FROM maltesegec-ngc-fixed
+
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir \
+    huggingface-hub \
+    pandas \
+    tqdm \
+    soundfile \
+    librosa \
+    torch \
+    torchaudio \
+    transformers
+
+RUN apt-get update && apt-get install -y \
+    libsndfile1 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+ENTRYPOINT ["/bin/bash"]
