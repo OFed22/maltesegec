@@ -20,6 +20,15 @@ data/
 └── vocabularies/      # Subword vocabularies
 ```
 
+## Dataset preperation
+
+Some datasets could not be uploaded to the repository as a whole, if you wish to use them use
+
+```
+cat data/synthetic/basic_combined_monolingual_part_* > data/synthetic/basic_combined_monolingual.txt
+cat data/synthetic/extended_combined_monolingual_part_* > data/synthetic/extended_combined_monolingual.txt
+cat data/monolingual/korpus_malti/processed/sentences_part_* > data/monolingual/korpus_malti/processed/sentences.txt
+
 ## Data Generation
 
 Generate synthetic error data using Docker:
