@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+"""
+Patch tensor2tensor 1.12.0 wiki_revision for Python 3 compatibility
+"""
+import os
+
+def patch_file(filepath, replacements):
+    with open(filepath, 'r') as f:
+        content = f.read()
+    
+    for old, new in replacements:
+        content = content.replace(old, new)
+    
+    with open(filepath, 'w') as f:
+        f.write(content)
+    print(f"Patched {filepath}")
+
+# Fix 1: Handle subprocess bytes output
+wiki_utils = "/usr/local/lib/python3.6/dist-packages/tensor2tensor/data_generators/wiki_revision_utils.py"
+patch_file(wiki_utils, [
+    # Fix the subprocess reading to handle bytes properly
+    ("def corpus_page_generator(file_list, tmp_dir, max_page_size_exp=27):",
+     "def corpus_page_generator(file_list, tmp_dir, max_page_size_exp=27):"),
+    ("    p = subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=-1)",
+     "    p = subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=-1, universal_newlines=True)")
+])
+
+# Fix 2: Handle text_encoder decode issue
+text_encoder = "/usr/local/lib/python3.6/dist-packages/tensor2tensor/data_generators/text_encoder.py"
+patch_file(text_encoder, [
+    ('return unicode(s, "utf-8") if six.PY2 else s.decode("utf-8")',
+     'return unicode(s, "utf-8") if six.PY2 else (s.decode("utf-8") if isinstance(s, bytes) else s)')
+])
+
+print("All patches applied successfully!")
